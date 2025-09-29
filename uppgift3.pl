@@ -1,4 +1,4 @@
-% Simple length predicate (if you don't already have my_length/2)
+% Simple length predicate
 my_length([], 0).
 my_length([_|T], N) :-
     my_length(T, N1),
