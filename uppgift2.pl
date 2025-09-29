@@ -1,12 +1,23 @@
-% Base case: tom lista
-remove_duplicates([], []).
+% remove_duplicates(InputList, ResultList)
+remove_duplicates(List, Result) :-
+    remove_duplicates_acc(List, [], Result).
 
-% Case 1: Om huvudet är inte i svansen, behåll H
-remove_duplicates([H|T], [H|Result]) :-
-    \+ member(H, T),
-    remove_duplicates(T, Result).
+% Base case: empty input list
+remove_duplicates_acc([], _, []) :- !.
 
-% Case 2: Om huvudet är redan i svansen, hoppa över H
-remove_duplicates([H|T], Result) :-
-    member(H, T),
-    remove_duplicates(T, Result).
+% Case 1: Head already seen, skip it
+remove_duplicates_acc([H|T], Seen, Result) :-
+    member(H, Seen), !,
+    remove_duplicates_acc(T, Seen, Result).
+
+% Case 2: Head not seen, keep it
+remove_duplicates_acc([H|T], Seen, [H|Result]) :-
+    remove_duplicates_acc(T, [H|Seen], Result).
+
+
+
+
+
+
+
+
