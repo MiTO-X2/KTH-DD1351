@@ -13,11 +13,3 @@ remove_duplicates_acc([H|T], Seen, Result) :-
 % Case 2: Head not seen, keep it
 remove_duplicates_acc([H|T], Seen, [H|Result]) :-
     remove_duplicates_acc(T, [H|Seen], Result).
-
-
-
-
-
-
-
-
