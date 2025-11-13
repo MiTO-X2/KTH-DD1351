@@ -110,3 +110,54 @@ valid_rule([_, Q, impel(X,Y)], _, Previous) :-
 valid_rule([_, imp(P,Q), impint(X,Y)], _, Previous) :-
     get_formula(X, Previous, P),
     get_formula(Y, Previous, Q).
+
+
+% Negation Introduction (¬i x–y)
+% If assuming P (line x) leads to a contradiction (line y), then infer neg(P)
+valid_rule([_, neg(P), negint(X,Y)], _, Previous) :-
+    get_formula(X, Previous, P),
+    get_formula(Y, Previous, cont).
+
+
+% Negation Elimination (¬e x,y)
+% If P and ¬P are both true, then infer contradiction (cont)
+valid_rule([_, cont, negel(X,Y)], _, Previous) :-
+    get_formula(X, Previous, P),
+    get_formula(Y, Previous, neg(P)).
+
+
+% Contradiction Elimination (⊥e x)
+% From a contradiction, any formula can be derived
+valid_rule([_, _, contel(X)], _, Previous) :-
+    get_formula(X, Previous, cont).
+
+
+% Double Negation Introduction (¬¬i x)
+% From P, infer ¬¬P
+valid_rule([_, neg(neg(P)), negnegint(X)], _, Previous) :-
+    get_formula(X, Previous, P).
+
+
+% Double Negation Elimination (¬¬e x)
+% From ¬¬P, infer P
+valid_rule([_, P, negnegel(X)], _, Previous) :-
+    get_formula(X, Previous, neg(neg(P))).
+
+
+% Modus Tollens (MT x,y)
+% From imp(P,Q) and ¬Q, infer ¬P
+valid_rule([_, neg(P), mt(X,Y)], _, Previous) :-
+    get_formula(X, Previous, imp(P,Q)),
+    get_formula(Y, Previous, neg(Q)).
+
+
+% Proof by Contradiction (PBC x–y)
+% If assuming ¬P leads to contradiction, infer P
+valid_rule([_, P, pbc(X,Y)], _, Previous) :-
+    get_formula(X, Previous, neg(P)),
+    get_formula(Y, Previous, cont).
+
+
+% Law of Excluded Middle (LEM)
+% P ∨ ¬P is always true
+valid_rule([_, or(P, neg(P)), lem], _, _).
