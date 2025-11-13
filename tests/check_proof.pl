@@ -63,3 +63,50 @@ valid_rule([_, A, andel1(X)], _, Previous) :-
 % If from line x we have and(_,B), we can conclude B.
 valid_rule([_, B, andel2(X)], _, Previous) :-
     get_formula(X, Previous, and(_,B)).
+
+
+% Or introduction rules (∨i1 x)
+% If from x we have A, we can conclude or(A, _) (for any B)
+valid_rule([_, or(A,_), orint1(X)], _, Previous) :-
+    get_formula(X, Previous, A).
+
+
+% Or introduction rules (∨i2 x)
+% If from x we have B, we can conclude or(_,B)
+valid_rule([_, or(_,B), orint2(X)], _, Previous) :-
+    get_formula(X, Previous, B).
+
+
+% Disjunction Elimination (∨e x,y–u,v–w)
+% If:
+%   - Line x contains or(P,Q)
+%   - From assuming P (at line y) we derive R (up to line u)
+%   - From assuming Q (at line v) we derive the same R (up to line w)
+% Then we can conclude R.
+valid_rule([_, R, orel(X,Y,U,V,W)], _, Previous) :-
+    % Line X must be or(P,Q)
+    get_formula(X, Previous, or(P,Q)),
+
+    % Find assumption/conclusion pairs for both subproofs
+    get_formula(Y, Previous, P),
+    get_formula(U, Previous, R1),
+    get_formula(V, Previous, Q),
+    get_formula(W, Previous, R2),
+
+    % Both subproofs must conclude the same R
+    R1 = R,
+    R2 = R.
+
+
+% Implication Elimination (→e x,y)
+% If from x we have P, and from y we have imp(P,Q), then we can infer Q
+valid_rule([_, Q, impel(X,Y)], _, Previous) :-
+    get_formula(X, Previous, P),
+    get_formula(Y, Previous, imp(P,Q)).
+
+
+% Implication Introduction (→i x–y)
+% If we assume P at line x, and later derive Q at line y, then we can conclude imp(P,Q)
+valid_rule([_, imp(P,Q), impint(X,Y)], _, Previous) :-
+    get_formula(X, Previous, P),
+    get_formula(Y, Previous, Q).
