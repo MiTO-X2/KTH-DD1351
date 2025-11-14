@@ -1,12 +1,17 @@
-[neg(neg(p)), imp(p,q)].  % Premises
+[or(p,q), neg(p)]. % Premises
 
-imp(neg(p), q).           % Goal
+r.                 % Goal
 
+% Proof
 [
-    [1, neg(neg(p)), premise],
-    [2, imp(p,q), premise],
-    [[3, neg(p), assumption],   % open box
-        [4, neg(p), copy(3)]   % incorrectly copy the assumption instead of deriving q
+    [1, or(p,q), premise],
+    [2, neg(p), premise],
+    [[3, p, assumption],          % open box for first disjunct
+        [4, r, copy(3)]           % invalidly try to derive r directly
     ],
-    [5, imp(neg(p), q), impint(3,4)] % close box →i
+    [[5, q, assumption],          % open box for second disjunct
+        [6, r, copy(5)]           % invalidly try to derive r directly
+    ],
+    [7, r, orel(1,3,4,5,6)]       % attempt disjunction elimination
 ].
+
