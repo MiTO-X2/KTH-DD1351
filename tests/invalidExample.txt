@@ -1,0 +1,12 @@
+[neg(neg(p)), imp(p,q)].  % Premises
+
+imp(neg(p), q).           % Goal
+
+[
+    [1, neg(neg(p)), premise],
+    [2, imp(p,q), premise],
+    [[3, neg(p), assumption],   % open box
+        [4, neg(p), copy(3)]   % incorrectly copy the assumption instead of deriving q
+    ],
+    [5, imp(neg(p), q), impint(3,4)] % close box →i
+].
