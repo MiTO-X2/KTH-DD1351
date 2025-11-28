@@ -93,3 +93,39 @@ check(T, L, S, U, af(F)) :-
     Succs \= [],                % if no successors and phi not true -> fail
     NewU = [S | U],
     all_check_on_list(T, L, Succs, NewU, af(F)).  % AF2
+
+% ---------------------
+% EG (exists globally)
+% EG1: if S in U -> success
+% EG2: otherwise phi must hold at S and there must exist a successor leading to EG
+% ---------------------
+check(_T, _L, S, U, eg(_F)) :-
+    member(S, U), !.           % EG1 (loop -> success)
+
+check(T, L, S, U, eg(F)) :-
+    \+ member(S, U),
+    check(T, L, S, [], F),                          % phi holds now
+    successors(T, S, Succs),
+    Succs \= [],                                    % need at least one successor to continue infinite path
+    NewU = [S | U],
+    member(Succ, Succs),
+    check(T, L, Succ, NewU, eg(F)).                % EG2 (existential continuation)
+
+% ---------------------
+% EF (exists eventually)
+% EF1: if phi holds now -> success
+% EF2: otherwise if S in U -> failure, else there must exist a successor satisfying EF
+% ---------------------
+check(T, L, S, _U, ef(F)) :-
+    check(T, L, S, [], F), !.   % EF1
+
+check(_T, _L, S, U, ef(_F)) :-
+    member(S, U), !, fail.      % encountering loop -> failure for EF
+
+check(T, L, S, U, ef(F)) :-
+    \+ member(S, U),
+    successors(T, S, Succs),
+    Succs \= [],
+    NewU = [S | U],
+    member(Succ, Succs),
+    check(T, L, Succ, NewU, ef(F)).  % EF2 (existential continuation)
