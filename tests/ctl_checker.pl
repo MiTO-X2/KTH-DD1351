@@ -59,3 +59,37 @@ check(T, L, S, [], ex(F)) :-
     successors(T, S, Succs),
     member(Succ, Succs),
     check(T, L, Succ, [], F).
+
+% ---------------------
+% AG (for all globally)
+% AG1: if S in U -> success
+% AG2: otherwise check phi at S and all successors for AG with U' = [S|U]
+% ---------------------
+check(_T, _L, S, U, ag(_F)) :-
+    member(S, U), !.    % rule 7 (AG1): loop means success
+
+check(T, L, S, U, ag(F)) :-
+    \+ member(S, U),
+    check(T, L, S, [], F),                          % need phi at S
+    successors(T, S, Succs),
+    Succs \= [],
+    NewU = [S | U],
+    all_check_on_list(T, L, Succs, NewU, ag(F)).
+
+% ---------------------
+% AF (for all eventually)
+% AF1: if phi holds now -> success
+% AF2: otherwise if S in U -> failure (cut out), else require AF on all successors
+% ---------------------
+check(T, L, S, _U, af(F)) :-
+    check(T, L, S, [], F), !.   % AF1 (immediate success)
+
+check(_T, _L, S, U, af(_F)) :-
+    member(S, U), !, fail.      % encountering loop -> failure for AF
+
+check(T, L, S, U, af(F)) :-
+    \+ member(S, U),
+    successors(T, S, Succs),
+    Succs \= [],                % if no successors and phi not true -> fail
+    NewU = [S | U],
+    all_check_on_list(T, L, Succs, NewU, af(F)).  % AF2
