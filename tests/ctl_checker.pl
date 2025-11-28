@@ -30,3 +30,32 @@ check(_, L, S, [], neg(P)) :-
     atom(P),
     member([S, Atoms], L),
     \+ member(P, Atoms).     % rule 2
+
+% ---------------------
+% Boolean connectives
+% ---------------------
+check(T, L, S, [], and(F, G)) :-
+    check(T, L, S, [], F),       % rule 3 left
+    check(T, L, S, [], G).       % rule 3 right
+
+check(T, L, S, [], or(F, _G)) :-
+    check(T, L, S, [], F).       % rule 4 (left)
+
+check(T, L, S, [], or(_F, G)) :-
+    check(T, L, S, [], G).       % rule 5 (right)
+
+% ---------------------
+% AX (for all next)
+% ---------------------
+check(T, L, S, [], ax(F)) :-
+    successors(T, S, Succs),
+    Succs \= [],                        
+    all_check_on_list(T, L, Succs, [], F).
+
+% ---------------------
+% EX (exists next)
+% ---------------------
+check(T, L, S, [], ex(F)) :-
+    successors(T, S, Succs),
+    member(Succ, Succs),
+    check(T, L, Succ, [], F).
