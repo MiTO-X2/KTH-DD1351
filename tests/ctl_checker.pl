@@ -129,3 +129,22 @@ check(T, L, S, U, ef(F)) :-
     NewU = [S | U],
     member(Succ, Succs),
     check(T, L, Succ, NewU, ef(F)).  % EF2 (existential continuation)
+
+% ---------------------
+% Helpers
+% ---------------------
+
+% successors(+T, +S, -Succs)
+% Find adjacency list for S in T, return Succs (empty list if missing)
+successors(T, S, Succs) :-
+    member([S, Succs], T), !.
+
+successors(_, _, []).    % if state not found → no successors
+
+
+% all_check_on_list(+T, +L, +ListOfStates, +U, +Formula)
+% true iff check(T,L,s_i,U,Formula) holds for all s_i in ListOfStates
+all_check_on_list(_, _, [], _U, _F).
+all_check_on_list(T, L, [S1|Rest], U, F) :-
+    check(T, L, S1, U, F),
+    all_check_on_list(T, L, Rest, U, F).
