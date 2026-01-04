@@ -1,0 +1,14 @@
+[neg(neg(p)), imp(p,q)].  % Premises
+
+imp(neg(p), q).           % Goal
+
+[
+    [1, neg(neg(p)), premise],
+    [2, imp(p,q), premise],
+    [[3, neg(p), assumption],   % open box
+        [4, p, negnegel(1)],    % from ¬¬p infer p
+        [5, cont, negel(4,3)],  % p and ¬p gives contradiction
+        [6, q, contel(5)]       % from contradiction, infer q
+    ],
+    [7, imp(neg(p), q), impint(3,6)] % close box →i
+].
