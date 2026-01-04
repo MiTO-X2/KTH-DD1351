@@ -1,0 +1,28 @@
+[
+  [s0, [s1]],            % Idle -> Sending
+  [s1, [s2, s3]],        % Sending -> Success | Retry
+  [s2, [s2]],            % Success is absorbing
+  [s3, [s1, s5]],        % Retry -> Sending (retry) | Backoff
+  [s5, [s3, s4]],        % Backoff -> Retry | Failure
+  [s4, [s4]]             % Failure is absorbing
+].
+[
+  [s0, [idle]],
+  [s1, [sent]],
+  [s2, [ok]],
+  [s3, [retry]],
+  [s5, [backoff]],
+  [s4, [fail]]
+].
+s0.
+
+ef(ok).
+
+% There exists a path from the initial state such that at some future point ok holds 
+% (i.e., a successful response occurs along some possible execution).
+
+% From s0 we can go to s1 (sent) and then to s2 (ok). 
+% Thus there is a path s0 -> s1 -> s2 where ok is reached. 
+% So EF ok is true in the initial state s0.
+
+% M, s0 |= EF ok should succeed.

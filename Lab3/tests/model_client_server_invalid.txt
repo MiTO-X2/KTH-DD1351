@@ -1,0 +1,29 @@
+[
+  [s0, [s1]],            % Idle -> Sending
+  [s1, [s2, s3]],        % Sending -> Success | Retry
+  [s2, [s2]],            % Success is absorbing
+  [s3, [s1, s5]],        % Retry -> Sending (retry) | Backoff
+  [s5, [s3, s4]],        % Backoff -> Retry | Failure
+  [s4, [s4]]             % Failure is absorbing
+].
+[
+  [s0, [idle]],
+  [s1, [sent]],
+  [s2, [ok]],
+  [s3, [retry]],
+  [s5, [backoff]],
+  [s4, [fail]]
+].
+s0.
+
+af(ok).
+
+% On all paths starting from the initial state, eventually ok will hold 
+% i.e., the system guarantees success regardless of nondeterministic choices.
+
+% There exists a path that avoids success and instead leads to permanent failure: 
+% s0 -> s1 -> s3 -> s5 -> s4 and s4 loops on itself (fail state). 
+% From s4 there is no path to ok. Because there is at least one path where ok never occurs, 
+% AF ok fails in the initial state.
+
+% M, s0 |= AF ok should fail.
